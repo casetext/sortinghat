@@ -99,32 +99,46 @@ exports.responder = function(path, options, cb) {
 };
 
 exports.job = function(fn) {
-	return function() {
-		exports.invoke(fn, {});
+	return function(cb) {
+		return exports.invoke(fn, {}, cb);
 	};
 };
 
 exports.invoke = function(fn, args, cb) {
-	var deferred = Q.defer();
-	request({
-		method: 'POST',
-		url: 'http://localhost:3033/2014-11-13/functions/' + fn + '/invoke-async/',
-		json: args,
-		pool: agentPool,
-		aws: {
-			key: process.env.AWS_ACCESS_KEY_ID,
-			secret: process.env.AWS_SECRET_ACCESS_KEY
-		}
-	}, function(err, res, body) {
-		if (err) {
-			deferred.reject(err);
-		} else if (res.statusCode != 202) {
-			deferred.reject(new Error('Invoke error ' + res.statusCode));
-		} else {
-			deferred.resolve();
-		}
-	});
+	var deferred = Q.defer(), tries = 0;
 
+	function tryInvoke() {
+		request({
+			method: 'POST',
+			url: 'http://localhost:3033/2014-11-13/functions/' + fn + '/invoke-async/',
+			json: args,
+			pool: agentPool,
+			aws: {
+				key: process.env.AWS_ACCESS_KEY_ID,
+				secret: process.env.AWS_SECRET_ACCESS_KEY
+			}
+		}, function(err, res, body) {
+			if (err) {
+				failed(err);
+			} else if (res.statusCode != 202) {
+				failed(new Error('Invoke error ' + res.statusCode));
+			} else {
+				deferred.resolve();
+			}
+		});
+	}
+
+	function failed(err) {
+		if (tries++ > 3) {
+			console.error('invoke ' + fn + ' failed', err);
+			deferred.reject(err);
+		} else {
+			console.warn('invoke ' + fn + ' failed, retry in ' + (Math.pow(2, tries) * 1000));
+			setTimeout(tryInvoke, Math.pow(2, tries) * 1000);
+		}
+	}
+
+	tryInvoke();
 	deferred.promise.nodeify(cb);
 	return deferred.promise;
 };
