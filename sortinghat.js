@@ -67,6 +67,35 @@ exports.watch = function(path, options, cb) {
 	return watcher;
 };
 
+exports.trigger = function(path, options, cb) {
+	var watcher = new FirebaseWatcher();
+	if (!root) {
+		throw new Error('Must init() the sorting hat before calling responder()');
+	}
+	if (typeof options == 'function' || typeof options == 'string') {
+		cb = options;
+		options = {};
+	}
+	if (typeof cb == 'function') {
+		watcher.on('request', cb);
+	} else if (typeof cb == 'string') {
+		watcher.on('request', function(snap) {
+			exports.invoke(cb, {
+				path: path,
+				key: snap.key(),
+				data: snap.val()
+			}, function() {
+				snap.ref().set(null);
+			});
+		});
+	}
+	options = _.assign({ path: path }, defaults, options);
+
+	var ref = root.child(path);
+	ref.on('child_added', function(snap) {
+		watcher.emit('request', snap);
+	});
+};
 
 exports.responder = function(path, options, cb) {
 	var watcher = new FirebaseWatcher();
@@ -83,7 +112,7 @@ exports.responder = function(path, options, cb) {
 		watcher.on('request', function(snap) {
 			exports.invoke(cb, {
 				path: path,
-				id: snap.key(),
+				key: snap.key(),
 				data: snap.val()
 			}, function() {
 				snap.ref().set(null);
