@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "sortinghat.js",
+  "bin": {
+    "fninvoke": "./invoke.js"
+  },
   "dependencies": {
     "lodash": "^3.0.0",
     "q": "^1.1.2",
