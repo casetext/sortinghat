@@ -127,9 +127,10 @@ exports.responder = function(path, options, cb) {
 	});
 };
 
-exports.job = function(fn) {
+exports.job = function(fn, args) {
+	args = args || {};
 	return function(cb) {
-		return exports.invoke(fn, {}, cb);
+		return exports.invoke(fn, args, cb);
 	};
 };
 
