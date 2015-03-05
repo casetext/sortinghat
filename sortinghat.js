@@ -2,6 +2,7 @@ var EventEmitter = require('events').EventEmitter,
 	util = require('util'),
 	_ = require('lodash'),
 	Q = require('q'),
+	aws4 = require('aws4'),
 	request = require('request');
 
 var root, defaults = {
@@ -13,6 +14,11 @@ var root, defaults = {
 exports.init = function(firebase) {
 	exports.root = root = firebase;
 };
+
+var host = 'http://localhost:3033';
+if (process.env.PRODUCTION) {
+	host = 'https://lambda.us-east-1.amazonaws.com';
+}
 
 
 // things that can go wrong
@@ -138,15 +144,20 @@ exports.invoke = function(fn, args, cb) {
 	var deferred = Q.defer(), tries = 0;
 
 	function tryInvoke() {
+		var path = '/2014-11-13/functions/' + fn + '/invoke-async/',
+			signature = aws4.sign({
+				service: 'lambda',
+				method: 'POST',
+				path: path,
+				body: JSON.stringify(args)
+			});
+
 		request({
 			method: 'POST',
-			url: 'http://localhost:3033/2014-11-13/functions/' + fn + '/invoke-async/',
+			url: host + path,
 			json: args,
 			pool: agentPool,
-			aws: {
-				key: process.env.AWS_ACCESS_KEY_ID,
-				secret: process.env.AWS_SECRET_ACCESS_KEY
-			}
+			headers: signature.headers
 		}, function(err, res, body) {
 			if (err) {
 				failed(err);

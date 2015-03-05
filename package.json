@@ -7,6 +7,7 @@
     "fninvoke": "./invoke.js"
   },
   "dependencies": {
+    "aws4": "^0.4.2",
     "lodash": "^3.0.0",
     "q": "^1.1.2",
     "request": "^2.51.0"
