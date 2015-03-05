@@ -76,7 +76,7 @@ exports.watch = function(path, options, cb) {
 exports.trigger = function(path, options, cb) {
 	var watcher = new FirebaseWatcher();
 	if (!root) {
-		throw new Error('Must init() the sorting hat before calling responder()');
+		throw new Error('Must init() the sorting hat before calling trigger()');
 	}
 	if (typeof options == 'function' || typeof options == 'string') {
 		cb = options;
