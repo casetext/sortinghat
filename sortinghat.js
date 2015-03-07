@@ -61,7 +61,6 @@ exports.watch = function(path, options, cb) {
 
 	var first = false;
 	ref.on('child_added', function(snap) {
-		console.log(snap.key());
 		if (first) {
 			watcher.emit('child_added', snap);
 		} else {
@@ -142,6 +141,7 @@ exports.job = function(fn, args) {
 
 exports.invoke = function(fn, args, cb) {
 	var deferred = Q.defer(), tries = 0;
+	args = JSON.stringify(args);
 
 	function tryInvoke() {
 		var path = '/2014-11-13/functions/' + fn + '/invoke-async/',
@@ -149,13 +149,15 @@ exports.invoke = function(fn, args, cb) {
 				service: 'lambda',
 				method: 'POST',
 				path: path,
-				body: JSON.stringify(args)
+				body: args
 			});
+
+		signature.headers['Content-Type'] = 'application/json; charset=utf-8';
 
 		request({
 			method: 'POST',
 			url: host + path,
-			json: args,
+			body: args,
 			pool: agentPool,
 			headers: signature.headers
 		}, function(err, res, body) {
@@ -171,10 +173,8 @@ exports.invoke = function(fn, args, cb) {
 
 	function failed(err) {
 		if (tries++ > 3) {
-			console.error('invoke ' + fn + ' failed', err);
 			deferred.reject(err);
 		} else {
-			console.warn('invoke ' + fn + ' failed, retry in ' + (Math.pow(2, tries) * 1000));
 			setTimeout(tryInvoke, Math.pow(2, tries) * 1000);
 		}
 	}
