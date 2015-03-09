@@ -16,7 +16,7 @@ exports.init = function(firebase) {
 };
 
 var host = 'http://localhost:3033';
-if (process.env.PRODUCTION) {
+if (process.env.NODE_ENV == 'production') {
 	host = 'https://lambda.us-east-1.amazonaws.com';
 }
 

@@ -50,4 +50,4 @@ The `cb` argument to `watch`, `trigger`, and `responder` can take either a funct
 Production
 ----------
 
-Sorting Hat will invoke AWS Lambda functions in AWS if `process.env.PRODUCTION` exists.  Otherwise, it will invoke your lambda functions at `http://localhost:3033`.  Use [locavore](https://www.npmjs.com/package/locavore) to run something that looks like AWS Lambda on your machine.
+Sorting Hat will invoke AWS Lambda functions in AWS if `process.env.NODE_ENV == 'production'`.  Otherwise, it will invoke your lambda functions at `http://localhost:3033`.  Use [locavore](https://www.npmjs.com/package/locavore) to run something that looks like AWS Lambda on your machine.
