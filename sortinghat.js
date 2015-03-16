@@ -139,12 +139,13 @@ exports.job = function(fn, args) {
 	};
 };
 
+exports.prefix = '';
 exports.invoke = function(fn, args, cb) {
 	var deferred = Q.defer(), tries = 0;
 	args = JSON.stringify(args);
 
 	function tryInvoke() {
-		var path = '/2014-11-13/functions/' + fn + '/invoke-async/',
+		var path = '/2014-11-13/functions/' + exports.prefix + fn + '/invoke-async/',
 			signature = aws4.sign({
 				service: 'lambda',
 				method: 'POST',

@@ -35,6 +35,9 @@ Sugar method.  Returns a function that takes a callback and always invokes `fn` 
 ### `invoke(fn[, args][, cb])`
 Invokes an AWS Lambda function named `fn`, passing `args`.  Returns a promise and/or calls `cb` when Lambda accepts the invocation.  Tries 4 times with exponential backoff.
 
+### `prefix`
+
+`invoke()` prefixes the function name passed in with this string.  Useful when you're versioning functions with a prefix.
 
 `cb`
 ----
