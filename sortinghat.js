@@ -150,10 +150,12 @@ exports.invoke = function(fn, args, cb) {
 				service: 'lambda',
 				method: 'POST',
 				path: path,
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8'
+				},
 				body: args
 			});
 
-		signature.headers['Content-Type'] = 'application/json; charset=utf-8';
 
 		request({
 			method: 'POST',
