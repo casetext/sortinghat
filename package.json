@@ -1,16 +1,10 @@
 {
   "name": "sortinghat",
-  "version": "1.0.4",
-  "description": "",
+  "version": "2.0.0",
+  "description": "Watches Firebase for changes",
   "main": "sortinghat.js",
-  "bin": {
-    "fninvoke": "./invoke.js"
-  },
   "dependencies": {
-    "aws4": "^0.4.2",
-    "lodash": "^3.0.0",
-    "q": "^1.1.2",
-    "request": "^2.51.0"
+    "lodash": "^3.0.0"
   },
   "devDependencies": {},
   "scripts": {
